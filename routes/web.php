@@ -1,18 +1,30 @@
 <?php
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
-//Route::middleware('api')->prefix('api')->group(function () {
-//    Route::prefix('auth')->group(function () {
-//        Route::post('/register', [AuthController::class, 'register']);
-//        Route::post('/login', [AuthController::class, 'login']);
-//    });
-//
-//    Route::middleware('auth:sanctum')->group(function () {
-//        Route::post('auth/logout', [AuthController::class, 'logout']);
-//
-//        Route::apiResource('reports', ReportController::class);
-//    });
-//});
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::get('/migrate', function () {
+    try {
+        Artisan::call('migrate');
+        return response()->json([
+            'success' => true,
+            'message' => 'Migrated successfully'
+        ]);
+    } catch (Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ]);
+    }
+});
+
+Route::get('db', function () {
+    $result = \Illuminate\Support\Facades\Process::run('sudo find / -name database.sqlite');
+    return response()->json([
+//        'data' => DB::connection()->getPdo()
+        'success' => $result,
+    ]);
+});
